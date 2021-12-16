@@ -1,5 +1,7 @@
 #pragma once
 
+typedef int(*__compar_fn_t)(const void*, const void*);
+
 void* __cdecl operator new(size_t size);
 
 void operator delete(void* p);
@@ -13,17 +15,33 @@ void  __cdecl operator delete[](void* p, size_t);
 void  __cdecl operator delete(void* p, size_t);
 
 namespace crt {
-	float sqrtf(float _X);
+	void* malloc(size_t size);
 
-	float expf(float _X);
+	void free(void* ptr);
+
+	void qsort(void* const pbase, size_t total_elems, size_t size, __compar_fn_t cmp);
+
+	float sqrtf(float _X);
 
 	float sinf(float _X);
 
 	float cosf(float _X);
 
-	float tanf(float _X);
+	//float tanf(float _X);
 
-	float asinf(float _X);
+	//float asinf(float _X);
+
+	double acosf(double _X);
+
+	int floorf(float x);
+
+	int ceilf(float x);
+
+	double fmod(double x, double y);
+
+	double pow(double x, int n);
+
+	double fabs(double x);
 
 	int toupper(int c);
 
