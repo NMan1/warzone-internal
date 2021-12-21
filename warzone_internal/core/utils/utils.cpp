@@ -1,8 +1,13 @@
 #include "utils.h"
+#include "../imports/lazy_importer.h"
 #include <windows.h>
 #include <vector>
 
 namespace utils {
+	void log(const char* format) {
+		LI_FN(MessageBoxA).safe_cached()(0, format, "Overflow", MB_OK);
+	}
+
 	uintptr_t rva(uintptr_t instruction_address, int instruction_size) {
 		return instruction_address + instruction_size + (uintptr_t) * (int*)(instruction_address + (instruction_size - sizeof(int)));
 	}

@@ -1,16 +1,19 @@
 #pragma once
-#include <d3d11.h>
 
-struct nk_context;
+struct IDXGISwapChain3;
+
+struct ID3D12Device;
+
+struct ID3D11DeviceContext;
+
+typedef void* HANDLE;
 
 namespace globals {
-	extern IDXGISwapChain* swapchain;
+	extern IDXGISwapChain3* swapchain;
 
-	extern ID3D11Device* d3d_device;
+	extern ID3D12Device* d3d_device;
 
-	extern ID3D11DeviceContext* d3d_context;
-
-	extern nk_context* nuklear_ctx;
+	extern HANDLE window;
 
 	extern int width;
 

@@ -4,6 +4,8 @@
 #include <stdarg.h>
 
 namespace utils {
+	void log(const char* format);
+
 	uintptr_t rva(uintptr_t instruction_address, int instruction_size);
 
 	//uint8_t* pattern_scan(void* module, const char* signature);
