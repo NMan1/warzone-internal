@@ -21,7 +21,7 @@ namespace renderer {
 
 	void draw_rect(const ImVec2& from, const ImVec2& to, clr color, float rounding, float thickness);
 
-	void draw_rect_filled(const ImVec2& from, const ImVec2& to, clr color, float rounding);
+	void draw_rect_filled(const ImVec2& from, const ImVec2& to, clr color, float rounding = 0);
 
 	void draw_text(const std::string& text, const ImVec2& position, float size, clr color, bool center=false);
 }

@@ -4,17 +4,25 @@
 #include <vector>
 
 namespace utils {
-	void log(const char* format) {
-		LI_FN(MessageBoxA).safe_cached()(0, format, "Overflow", MB_OK);
+	std::ofstream* log_file;
+
+	std::string log_path;
+
+	void log_init(std::string file_path) {
+		log_file = new std::ofstream();
+		utils::log_path.assign(file_path);
 	}
 
-	uintptr_t rva(uintptr_t instruction_address, int instruction_size) {
-		return instruction_address + instruction_size + (uintptr_t) * (int*)(instruction_address + (instruction_size - sizeof(int)));
+	bool is_bad_ptr(uintptr_t* ptr) {
+		if (!ptr || (uint64_t)ptr > 0xffffffffffff)
+			return true;
+
+		return false;
 	}
 
-	/*uint8_t* pattern_scan(void* module, const char* signature) {
+	uintptr_t pattern_scan(uintptr_t module_base, const char* signature) {
 		static auto pattern_to_byte = [](const char* pattern) {
-			auto bytes = std::vector<int>{};
+			auto bytes = std::vector < int >{};
 			auto start = const_cast<char*>(pattern);
 			auto end = const_cast<char*>(pattern) + strlen(pattern);
 
@@ -32,12 +40,12 @@ namespace utils {
 			return bytes;
 		};
 
-		auto dos_headers = reinterpret_cast<PIMAGE_DOS_HEADER>(module);
-		auto nt_headers = reinterpret_cast<PIMAGE_NT_HEADERS>((std::uint8_t*)module + dos_headers->e_lfanew);
+		auto dosHeader = (PIMAGE_DOS_HEADER)module_base;
+		auto ntHeaders = (PIMAGE_NT_HEADERS)((uint8_t*)module_base + dosHeader->e_lfanew);
 
-		auto size_of_image = nt_headers->OptionalHeader.SizeOfImage;
+		auto size_of_image = ntHeaders->OptionalHeader.SizeOfImage;
 		auto pattern_bytes = pattern_to_byte(signature);
-		auto scan_bytes = reinterpret_cast<std::uint8_t*>(module);
+		auto module_bytes = reinterpret_cast<uint8_t*>(module_base);
 
 		auto s = pattern_bytes.size();
 		auto d = pattern_bytes.data();
@@ -45,22 +53,15 @@ namespace utils {
 		for (auto i = 0ul; i < size_of_image - s; ++i) {
 			bool found = true;
 			for (auto j = 0ul; j < s; ++j) {
-				if (scan_bytes[i + j] != d[j] && d[j] != -1) {
+				if (module_bytes[i + j] != d[j] && d[j] != -1) {
 					found = false;
 					break;
 				}
 			}
 			if (found) {
-				return &scan_bytes[i];
+				return (uintptr_t)&module_bytes[i];
 			}
 		}
-		return nullptr;
-	}*/
-
-	bool is_bad_ptr(uintptr_t* ptr) {
-		if (!ptr || (uint64_t)ptr > 0xffffffffffff)
-			return true;
-
-		return false;
+		return NULL;
 	}
 }

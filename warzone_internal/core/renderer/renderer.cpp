@@ -11,6 +11,7 @@
 #include "imgui/imgui_internal.h"
 #include "imgui/imgui_impl_win32.h"
 #include "imgui/imgui_impl_dx12.h"
+#include "../utils/utils.h"
 
 ID3D12DescriptorHeap* d3d12DescriptorHeapBackBuffers = nullptr;
 ID3D12DescriptorHeap* d3d12DescriptorHeapImGuiRender = nullptr;
@@ -32,15 +33,12 @@ namespace renderer {
 	ImFont* font;
 
 	bool init() {
-		if (!globals::d3d_device || !globals::window) {
-			MessageBoxA(0, "invalid d3d_device", "", MB_OK);
+		if (!globals::d3d_device) {
+			utils::log("invalid d3d_device");
 			return false;
 		}
 
-		if (!globals::window) {
-			MessageBoxA(0, "invalid window", "", MB_OK);
-			return false;
-		}
+		d3d12CommandQueue = *(ID3D12CommandQueue**)((uintptr_t)globals::swapchain + 0x118);
 
 		ImGui::CreateContext();
 
@@ -71,13 +69,11 @@ namespace renderer {
 		descriptorImGuiRender.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 
 		if (globals::d3d_device->CreateDescriptorHeap(&descriptorImGuiRender, IID_PPV_ARGS(&d3d12DescriptorHeapImGuiRender)) != S_OK) {
-			MessageBoxA(0, "failed to create descriptor heap", "", MB_OK);
 			return false;
 		}
 
 		ID3D12CommandAllocator* allocator;
 		if (globals::d3d_device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&allocator)) != S_OK) {
-			MessageBoxA(0, "failed to create command allocater", "", MB_OK);
 			return false;
 		}
 
@@ -85,8 +81,7 @@ namespace renderer {
 			frameContext[i].commandAllocator = allocator;
 		}
 
-		if (globals::d3d_device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, allocator, NULL, IID_PPV_ARGS(&d3d12CommandList)) != S_OK ||
-			d3d12CommandList->Close() != S_OK)
+		if (globals::d3d_device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, allocator, NULL, IID_PPV_ARGS(&d3d12CommandList)) != S_OK || d3d12CommandList->Close() != S_OK)
 			return false;
 
 		D3D12_DESCRIPTOR_HEAP_DESC descriptorBackBuffers;
@@ -124,7 +119,7 @@ namespace renderer {
 
 	void begin() {
 		ImGui_ImplDX12_NewFrame();
-		//ImGui_ImplWin32_NewFrame();
+		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 		ImGuiIO& io = ImGui::GetIO();
 
