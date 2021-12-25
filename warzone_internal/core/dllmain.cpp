@@ -3,8 +3,12 @@
 #include "utils/globals.h"
 #include "renderer/renderer.h"
 #include "utils/utils.h"
-#include <dxgi1_4.h>
 #include "game/game.h"
+#include "game/offsets.h"
+#include "game/features/features.h"
+#include <dxgi1_4.h>
+
+#define VERSION "1.2"
 
 extern "C" { unsigned int _fltused = 1; }
 
@@ -23,24 +27,68 @@ extern "C" long __declspec(dllexport) hook_main(IDXGISwapChain3* swapchain, UINT
 			utils::log("invalid window");
 		}
 
-		utils::log("window", globals::window);
-
 		if (!SUCCEEDED((globals::swapchain = swapchain)->GetDevice(__uuidof(ID3D12Device), (void**)&globals::d3d_device))) {
 			utils::log("failed to get d3d device");
         }
 
 		renderer::init();
 
+		renderer::original_wndproc = reinterpret_cast<WNDPROC>(SetWindowLongPtrW((HWND)globals::window, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(renderer::wndproc)));
+
+		globals::base = (uintptr_t)GetModuleHandleA(NULL);	
+
+		game::client_info = decryption::get_client_info(__readgsqword(0x60));
+		if (!game::client_info) {
+			utils::log("invalid client info");
+			exit(0);
+		}
+
+		game::client_info_base = decryption::get_client_info_base(game::client_info, __readgsqword(0x60));
+		if (!game::client_info_base) {
+			utils::log("invalid client info base");
+			exit(0);
+		}
+
+		auto ref_temp = decryption::get_ref_def();
+		if (!ref_temp) {
+			utils::log("invalid ref def ptr");
+			exit(0);
+		}
+
+		game::ref_def = *(game::ref_def_t*)ref_temp;
+
 		utils::log("intialzied");
 		init = true;
 	}
 	
 	renderer::begin();
-	renderer::draw_rect_filled({ 200, 200 }, { 200 + 40, 200 + 100 }, { 255, 0, 0, 255 });
-	renderer::draw_text("overflow", { 15, 10 }, 18, { 255, 0, 0, 255 });
+	renderer::draw_text("overflow", { 15, 25 }, 18, { 255, 255, 255, 255 }); 
+	renderer::draw_text("    ver " + std::string(VERSION), {15, 42}, 15, { 255, 7, 58, 255});
+
+	static bool new_game = true;
+	auto ref_def_ptr = decryption::get_ref_def();
+	if (ref_def_ptr && game::in_game()) {
+		if (new_game) {
+			decryption::update();
+			new_game = false;
+		}
+
+		game::ref_def = *(game::ref_def_t*)ref_def_ptr;
+
+		features::esp();
+
+		if (globals::settings::no_recoil && syscall<short>(0x1044, VK_LBUTTON)) {
+			features::no_recoil();
+		}
+	}
+	else {
+		new_game = true;
+	}
+
 	renderer::end();
 
-	if (syscall<short>(0x1044, 0x23) & 1) { // VK_END
+	if (syscall<short>(0x1044, VK_END) & 1) { // VK_END
+		SetWindowLongPtrW((HWND)globals::window, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(renderer::wndproc));
 		uintptr_t relative_address{};
 		auto intruction_address = utils::pattern_scan((uintptr_t)LI_MODULE("DiscordHook64.dll").safe_cached(), "FF 15 ?? ?? ?? ?? 89 C6 48 8D ?? ?? ?? E8 ?? ?? ?? ?? 48 8B ?? ?? ?? 48 31 ?? E8 ?? ?? ?? ?? 89 F0 48 83 C4 ?? 5B 5F 5E C3");
 		memcpy(&relative_address, (void*)(intruction_address + 0x2), 0x4);

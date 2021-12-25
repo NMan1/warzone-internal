@@ -28,7 +28,7 @@ namespace utils {
 		*utils::log_file << get_time() << " [-] " << v << "\n";
 		utils::log_file->close();
 	}
-
+	
 	template<typename Arg, typename ...Args>
 	void log(Arg const& arg, Args const&... args) {
 		log(arg);

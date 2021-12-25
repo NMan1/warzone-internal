@@ -1,5 +1,6 @@
 #pragma once
 #include "imgui/imgui.h"
+#include <Windows.h>
 #include <string>
 
 struct clr {
@@ -7,6 +8,8 @@ struct clr {
 };
 
 namespace renderer {
+	extern WNDPROC original_wndproc;
+
 	bool init();
 
 	void begin();
@@ -24,4 +27,6 @@ namespace renderer {
 	void draw_rect_filled(const ImVec2& from, const ImVec2& to, clr color, float rounding = 0);
 
 	void draw_text(const std::string& text, const ImVec2& position, float size, clr color, bool center=false);
+
+	LRESULT wndproc(HWND hwnd, UINT msg, WPARAM param, LPARAM lparam);
 }

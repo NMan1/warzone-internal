@@ -1,6 +1,7 @@
 #include "renderer.h"
-#include "tahoma.h"
 #include "../utils/globals.h"
+#include "../utils/utils.h"
+#include "menu.h"
 
 #include <dxgi.h>
 #include <dxgi1_4.h>
@@ -11,7 +12,6 @@
 #include "imgui/imgui_internal.h"
 #include "imgui/imgui_impl_win32.h"
 #include "imgui/imgui_impl_dx12.h"
-#include "../utils/utils.h"
 
 ID3D12DescriptorHeap* d3d12DescriptorHeapBackBuffers = nullptr;
 ID3D12DescriptorHeap* d3d12DescriptorHeapImGuiRender = nullptr;
@@ -29,8 +29,12 @@ struct FrameContext {
 uint32_t buffersCounts = -1;
 FrameContext* frameContext;
 
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 namespace renderer {
 	ImFont* font;
+
+	WNDPROC original_wndproc;
 
 	bool init() {
 		if (!globals::d3d_device) {
@@ -45,7 +49,7 @@ namespace renderer {
 		unsigned char* pixels;
 		int width, height;
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		ImGui::StyleColorsDark();
+		menu::setup_theme();
 		io.Fonts->AddFontDefault();
 		io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
 		io.IniFilename = NULL;
@@ -112,16 +116,22 @@ namespace renderer {
 			d3d12DescriptorHeapImGuiRender->GetCPUDescriptorHandleForHeapStart(),
 			d3d12DescriptorHeapImGuiRender->GetGPUDescriptorHandleForHeapStart());
 
-		font = io.Fonts->AddFontFromMemoryTTF(tahoma_ttf, sizeof(tahoma_ttf), 12, nullptr, io.Fonts->GetGlyphRangesCyrillic());
+		font = ImGui::GetIO().Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Tahoma.ttf", 18, nullptr, io.Fonts->GetGlyphRangesCyrillic());
 
-		ImGui_ImplDX12_CreateDeviceObjects();
+		ImGui_ImplDX12_CreateDeviceObjects();		
 	}
 
 	void begin() {
 		ImGui_ImplDX12_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
+
 		ImGuiIO& io = ImGui::GetIO();
+
+		if (menu::open) {
+			//io.WantCaptureMouse = !io.WantCaptureMouse;
+			menu::render();
+		}
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0.0f, 0.0f });
@@ -168,10 +178,6 @@ namespace renderer {
 		d3d12CommandQueue->ExecuteCommandLists(1, reinterpret_cast<ID3D12CommandList* const*>(&d3d12CommandList));
 	}
 
-	void menu() {
-
-	}
-
 	void draw_line(const ImVec2& from, const ImVec2& to, clr color, float thickness) {
 		ImGuiWindow* window = ImGui::GetCurrentWindow();
 		window->DrawList->AddLine(from, to, ImGui::GetColorU32({ color.r / 255.0f, color.g / 255.0f, color.b / 255.0f, color.a / 255.0f }), thickness);
@@ -207,4 +213,42 @@ namespace renderer {
 			window->DrawList->AddText(font, size, { position.x, position.y }, ImGui::GetColorU32({ color.r / 255.0f, color.g / 255.0f, color.b / 255.0f, color.a / 255.0f }), text.c_str());
 		}
 	}
+
+	LRESULT wndproc(HWND hwnd, UINT msg, WPARAM param, LPARAM lparam) {
+		ImGuiIO& io = ImGui::GetIO();
+		switch (msg) {
+		case WM_SETCURSOR: {
+			if (io.WantCaptureMouse) {
+				return ImGui_ImplWin32_WndProcHandler(hwnd, msg, param, lparam);
+			}
+			else {
+				return CallWindowProc(renderer::original_wndproc, hwnd, msg, param, lparam);
+			}
+		}
+		case WM_KEYDOWN: {
+			if (param == VK_INSERT || param == VK_F5) // 0x4E = M
+				menu::open = !menu::open;
+			break;
+		}
+		case WM_KEYUP: {
+			break;
+		}
+		};
+
+		ImGui_ImplWin32_WndProcHandler(hwnd, msg, param, lparam);
+		if (io.WantCaptureMouse &&
+			(msg == WM_LBUTTONDOWN || msg == WM_LBUTTONUP || msg == WM_RBUTTONDOWN || msg == WM_RBUTTONUP ||
+				msg == WM_MBUTTONDOWN || msg == WM_MBUTTONUP || msg == WM_MOUSEWHEEL || msg == WM_MOUSEMOVE ||
+				msg == WM_MOUSEHOVER || msg == WM_KEYDOWN || msg == WM_KEYUP)) {
+			return TRUE;
+		}
+		if (io.WantCaptureKeyboard && (
+			msg == WM_KEYDOWN || msg == WM_KEYUP
+			)) {
+			return TRUE;
+		}
+
+		return CallWindowProc(renderer::original_wndproc, hwnd, msg, param, lparam);
+	}
+
 }
