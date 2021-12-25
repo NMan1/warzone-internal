@@ -26,6 +26,8 @@ namespace globals {
 	extern int height;
 
 	namespace settings {
+		extern bool end_cheat;
+
 		extern bool esp;
 
 		extern int max_render_distance;
@@ -47,5 +49,7 @@ namespace globals {
 		extern clr snap_lines_clr;
 
 		extern bool no_recoil;
+		
+		extern bool no_recoil_key_toggle;
 	}
 }

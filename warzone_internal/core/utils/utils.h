@@ -1,10 +1,9 @@
 #pragma once
+#include <windows.h>
 #include <cstdint>
 #include <string>
 #include <stdarg.h>
-#include <iostream>
 #include <fstream>
-#include <stdexcept>
 
 namespace utils {
 	extern std::ofstream* log_file;
@@ -38,4 +37,8 @@ namespace utils {
 	bool is_bad_ptr(uintptr_t* ptr);
 
 	uintptr_t pattern_scan(uintptr_t module_base, const char* signature);
+
+	bool get_cursor_pos(LPPOINT point);
+
+	HCURSOR set_cursor(HCURSOR cursor);
 }

@@ -29,6 +29,7 @@
 typedef DWORD(WINAPI* PFN_XInputGetCapabilities)(DWORD, DWORD, XINPUT_CAPABILITIES*);
 typedef DWORD(WINAPI* PFN_XInputGetState)(DWORD, XINPUT_STATE*);
 #endif
+#include "../../utils/utils.h"
 
 // CHANGELOG
 // (minor and older changes stripped away, please see git history for details)
@@ -168,7 +169,7 @@ static bool ImGui_ImplWin32_UpdateMouseCursor()
     if (imgui_cursor == ImGuiMouseCursor_None || io.MouseDrawCursor)
     {
         // Hide OS mouse cursor if imgui is drawing it or if it wants no cursor
-        ::SetCursor(NULL);
+        utils::set_cursor(NULL);
     }
     else
     {
@@ -186,7 +187,7 @@ static bool ImGui_ImplWin32_UpdateMouseCursor()
         case ImGuiMouseCursor_Hand:         win32_cursor = IDC_HAND; break;
         case ImGuiMouseCursor_NotAllowed:   win32_cursor = IDC_NO; break;
         }
-        ::SetCursor(::LoadCursor(NULL, win32_cursor));
+        utils::set_cursor(::LoadCursor(NULL, win32_cursor));
     }
     return true;
 }
@@ -197,19 +198,20 @@ static void ImGui_ImplWin32_UpdateMousePos()
     IM_ASSERT(g_hWnd != 0);
 
     // Set OS mouse position if requested (rarely used, only when ImGuiConfigFlags_NavEnableSetMousePos is enabled by user)
-    if (io.WantSetMousePos)
+   /* if (io.WantSetMousePos)
     {
         POINT pos = { (int)io.MousePos.x, (int)io.MousePos.y };
         if (::ClientToScreen(g_hWnd, &pos))
+			utils::set_cursor_pos(&pos)
             ::SetCursorPos(pos.x, pos.y);
-    }
+    }*/
 
     // Set mouse position
     io.MousePos = ImVec2(-FLT_MAX, -FLT_MAX);
     POINT pos;
     if (HWND active_window = ::GetForegroundWindow())
         if (active_window == g_hWnd || ::IsChild(active_window, g_hWnd))
-            if (::GetCursorPos(&pos) && ::ScreenToClient(g_hWnd, &pos))
+            if (utils::get_cursor_pos(&pos) && ::ScreenToClient(g_hWnd, &pos))
                 io.MousePos = ImVec2((float)pos.x, (float)pos.y);
 }
 

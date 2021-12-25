@@ -1,7 +1,7 @@
 #include "utils.h"
 #include "../imports/lazy_importer.h"
-#include <windows.h>
 #include <vector>
+#include "../imports/syscall/syscall.h"
 
 namespace utils {
 	std::ofstream* log_file;
@@ -63,5 +63,59 @@ namespace utils {
 			}
 		}
 		return NULL;
+	}
+
+	// mutable thx, for sys call ids
+
+	std::string get_version() {
+		DWORD dwType = REG_SZ;
+		HKEY hKey = 0;
+		char value[1024];
+		DWORD value_length = 1024;
+		const char* subkey = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion";
+		RegOpenKeyA(HKEY_LOCAL_MACHINE, subkey, &hKey);
+		const auto status = RegQueryValueExA(hKey, "DisplayVersion", NULL, &dwType, (LPBYTE)&value, &value_length);
+		RegCloseKey(hKey);
+		return std::string(value);
+	}
+
+	bool get_cursor_pos(LPPOINT point) {
+		static auto version = get_version();
+		int id = 4138;
+
+		if (version == "1507") { id = 4141; }
+		else if (version == "1511") { id = 4141; }
+		else if (version == "1607") { id = 4141; }
+		else if (version == "1703") { id = 4141; }
+		else if (version == "1709") { id = 4141; }
+		else if (version == "1803") { id = 4141; }
+		else if (version == "1809") { id = 4141; }
+		else if (version == "1903") { id = 4141; }
+		else if (version == "1909") { id = 4141; }
+		else if (version == "2004") { id = 4138; }
+		else if (version == "20H2") { id = 4138; }
+		else if (version == "21H2") { id = 5149; }
+
+		return syscall<bool>(id, point, 1, 127);
+	}
+
+	HCURSOR set_cursor(HCURSOR cursor) {
+		static auto version = get_version();
+		int id = 4122;
+
+		if (version == "1507") { id = 4125; }
+		else if (version == "1511") { id = 4125; }
+		else if (version == "1607") { id = 4125; }
+		else if (version == "1703") { id = 4125; }
+		else if (version == "1709") { id = 4125; }
+		else if (version == "1803") { id = 4125; }
+		else if (version == "1809") { id = 4125; }
+		else if (version == "1903") { id = 4125; }
+		else if (version == "1909") { id = 4125; }
+		else if (version == "2004") { id = 4122; }
+		else if (version == "20H2") { id = 4122; }
+		else if (version == "21H2") { id = 4120; }
+
+		return syscall<HCURSOR>(id, cursor);
 	}
 }

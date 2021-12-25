@@ -16,6 +16,8 @@ namespace globals {
 	int height = 0;
 
 	namespace settings {
+		bool end = false;
+
 		bool esp = true;
 
 		int max_render_distance = 250;
@@ -37,5 +39,7 @@ namespace globals {
 		clr snap_lines_clr = { 51, 51, 51, 225 };
 
 		bool no_recoil = true;
+
+		bool no_recoil_key_toggle = false;
 	}
 }

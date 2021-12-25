@@ -116,7 +116,7 @@ namespace renderer {
 			d3d12DescriptorHeapImGuiRender->GetCPUDescriptorHandleForHeapStart(),
 			d3d12DescriptorHeapImGuiRender->GetGPUDescriptorHandleForHeapStart());
 
-		font = ImGui::GetIO().Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Tahoma.ttf", 18, nullptr, io.Fonts->GetGlyphRangesCyrillic());
+		font = ImGui::GetIO().Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Tahoma.ttf", 20, nullptr, io.Fonts->GetGlyphRangesCyrillic());
 
 		ImGui_ImplDX12_CreateDeviceObjects();		
 	}
@@ -127,9 +127,9 @@ namespace renderer {
 		ImGui::NewFrame();
 
 		ImGuiIO& io = ImGui::GetIO();
+		//io.WantCaptureMouse = menu::open;
 
 		if (menu::open) {
-			//io.WantCaptureMouse = !io.WantCaptureMouse;
 			menu::render();
 		}
 
@@ -217,25 +217,26 @@ namespace renderer {
 	LRESULT wndproc(HWND hwnd, UINT msg, WPARAM param, LPARAM lparam) {
 		ImGuiIO& io = ImGui::GetIO();
 		switch (msg) {
-		case WM_SETCURSOR: {
+		/*case WM_SETCURSOR: {
 			if (io.WantCaptureMouse) {
 				return ImGui_ImplWin32_WndProcHandler(hwnd, msg, param, lparam);
 			}
 			else {
 				return CallWindowProc(renderer::original_wndproc, hwnd, msg, param, lparam);
 			}
-		}
+		}*/
 		case WM_KEYDOWN: {
-			if (param == VK_INSERT || param == VK_F5) // 0x4E = M
+			if (param == VK_END)
+				globals::settings::end_cheat = true;
+			else if (param == VK_INSERT || param == VK_F5) // 0x4E = M
 				menu::open = !menu::open;
-			break;
-		}
-		case WM_KEYUP: {
+			else if (param == VK_LBUTTON)
+				globals::settings::no_recoil_key_toggle = true;
 			break;
 		}
 		};
 
-		ImGui_ImplWin32_WndProcHandler(hwnd, msg, param, lparam);
+		/*ImGui_ImplWin32_WndProcHandler(hwnd, msg, param, lparam);
 		if (io.WantCaptureMouse &&
 			(msg == WM_LBUTTONDOWN || msg == WM_LBUTTONUP || msg == WM_RBUTTONDOWN || msg == WM_RBUTTONUP ||
 				msg == WM_MBUTTONDOWN || msg == WM_MBUTTONUP || msg == WM_MOUSEWHEEL || msg == WM_MOUSEMOVE ||
@@ -248,7 +249,10 @@ namespace renderer {
 			return TRUE;
 		}
 
+		return CallWindowProc(renderer::original_wndproc, hwnd, msg, param, lparam);*/
+
+		if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, param, lparam))
+			return true;
 		return CallWindowProc(renderer::original_wndproc, hwnd, msg, param, lparam);
 	}
-
 }

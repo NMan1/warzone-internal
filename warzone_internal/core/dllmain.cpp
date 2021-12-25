@@ -1,4 +1,3 @@
-#include "imports/syscall/syscall.h"
 #include "imports/lazy_importer.h"
 #include "utils/globals.h"
 #include "renderer/renderer.h"
@@ -65,6 +64,21 @@ extern "C" long __declspec(dllexport) hook_main(IDXGISwapChain3* swapchain, UINT
 	renderer::draw_text("overflow", { 15, 25 }, 18, { 255, 255, 255, 255 }); 
 	renderer::draw_text("    ver " + std::string(VERSION), {15, 42}, 15, { 255, 7, 58, 255});
 
+	const auto bone_base = decryption::get_bone_base(__readgsqword(0x60));
+	char buf[64];
+	sprintf(buf, "bone_base %p", bone_base);
+	renderer::draw_text(buf, { 15, 200 }, 16, { 255, 50, 50, 255 });
+
+	const auto bone_index = decryption::get_bone_index(7);
+	sprintf(buf, "bone_index %p", bone_index);
+	renderer::draw_text(buf, { 15, 215 }, 16, { 255, 50, 50, 255 });
+
+	if (game::client_info) {
+		const auto bone_base_pos = game::get_bone_base_pos(game::client_info);
+		sprintf(buf, "bone_base_pos %d, %d, %d", bone_base_pos.x, bone_base_pos.y, bone_base_pos.z);
+		renderer::draw_text(buf, { 15, 230 }, 16, { 255, 50, 50, 255 });
+	}
+
 	static bool new_game = true;
 	auto ref_def_ptr = decryption::get_ref_def();
 	if (ref_def_ptr && game::in_game()) {
@@ -77,8 +91,9 @@ extern "C" long __declspec(dllexport) hook_main(IDXGISwapChain3* swapchain, UINT
 
 		features::esp();
 
-		if (globals::settings::no_recoil && syscall<short>(0x1044, VK_LBUTTON)) {
+		if (globals::settings::no_recoil && globals::settings::no_recoil_key_toggle) {
 			features::no_recoil();
+			globals::settings::no_recoil_key_toggle = false;
 		}
 	}
 	else {
@@ -87,7 +102,7 @@ extern "C" long __declspec(dllexport) hook_main(IDXGISwapChain3* swapchain, UINT
 
 	renderer::end();
 
-	if (syscall<short>(0x1044, VK_END) & 1) { // VK_END
+	if (globals::settings::end_cheat) { 
 		SetWindowLongPtrW((HWND)globals::window, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(renderer::wndproc));
 		uintptr_t relative_address{};
 		auto intruction_address = utils::pattern_scan((uintptr_t)LI_MODULE("DiscordHook64.dll").safe_cached(), "FF 15 ?? ?? ?? ?? 89 C6 48 8D ?? ?? ?? E8 ?? ?? ?? ?? 48 8B ?? ?? ?? 48 31 ?? E8 ?? ?? ?? ?? 89 F0 48 83 C4 ?? 5B 5F 5E C3");

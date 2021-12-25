@@ -117,6 +117,18 @@ namespace game {
         return *(int*)(address + offsets::player::stance);
     }
 
+	uintptr_t player_t::get_bone_ptr(uintptr_t bone_base, uint64_t bone_index) {
+		return *(uintptr_t*)(bone_base + (bone_index * offsets::bone::size) + 0xC0);
+	}
+
+	vec3_t player_t::get_bone_position(uintptr_t bone_ptr, vec3_t& base_pos, int bone) {
+		return base_pos + *(vec3_t*)(bone_ptr + ((uint64_t)bone * 0x20) + 0x10);
+	}
+
+	vec3_t get_bone_base_pos(uintptr_t client_info) {
+		return *(vec3_t*)(client_info + offsets::bone::bone_base);
+	}
+
 	vec3_t get_camera_position() {
 		auto camera = *(uintptr_t*)(globals::base + offsets::camera_base);
 		if (!camera)
@@ -179,13 +191,13 @@ namespace decryption {
     void update() {
         game::client_info = decryption::get_client_info(__readgsqword(0x60));
         if (!game::client_info) {
-            utils::log("invalid client info");
+            utils::log("invalid client info (update dec new game)");
             exit(0);
         }
 
         game::client_info_base = decryption::get_client_info_base(game::client_info, __readgsqword(0x60));
         if (!game::client_info_base) {
-            utils::log("invalid client info base");
+            utils::log("invalid client info base (update dec new game)");
             exit(0);
         }
     }
@@ -769,6 +781,655 @@ namespace decryption {
         }
         }
     }
+
+	uintptr_t get_bone_base(uintptr_t peb) {
+		uint64_t rax = globals::base, rbx = globals::base, rcx = globals::base, rdx = globals::base, rdi = globals::base, rsi = globals::base, r8 = globals::base, r9 = globals::base, r10 = globals::base, r11 = globals::base, r12 = globals::base, r13 = globals::base, r14 = globals::base, r15 = globals::base;
+		rdx = *(uintptr_t*)(globals::base + 0x1C262B48);
+		if (!rdx)
+			return rdx;
+		r11 = peb;              //mov r11, gs:[rax]
+		rax = r11;              //mov rax, r11
+		rax = _rotr64(rax, 0x19);               //ror rax, 0x19
+		rax &= 0xF;
+		switch (rax) {
+		case 0:
+		{
+			r9 = *(uintptr_t*)(globals::base + 0x7821223);               //mov r9, [0x0000000004CA9601]
+			rax = globals::base;           //lea rax, [0xFFFFFFFFFD488269]
+			rdx += rax;             //add rdx, rax
+			rax = 0x9D49503AEEC3085C;               //mov rax, 0x9D49503AEEC3085C
+			rdx ^= rax;             //xor rdx, rax
+			r15 = globals::base;           //lea r15, [0xFFFFFFFFFD48807B]
+			rdx += r15;             //add rdx, r15
+			rax = 0;                //and rax, 0xFFFFFFFFC0000000
+			rax = _rotl64(rax, 0x10);               //rol rax, 0x10
+			rax ^= r9;              //xor rax, r9
+			rax = _byteswap_uint64(rax);            //bswap rax
+			rdx *= *(uintptr_t*)(rax + 0x9);              //imul rdx, [rax+0x09]
+			rax = 0x5F5A112DC99B7A4B;               //mov rax, 0x5F5A112DC99B7A4B
+			rdx *= rax;             //imul rdx, rax
+			rax = globals::base;           //lea rax, [0xFFFFFFFFFD48838E]
+			rdx += rax;             //add rdx, rax
+			rax = 0x913CFC69B7F3F340;               //mov rax, 0x913CFC69B7F3F340
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0xC;            //shr rax, 0x0C
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x18;           //shr rax, 0x18
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x30;           //shr rax, 0x30
+			rdx ^= rax;             //xor rdx, rax
+			return rdx;
+		}
+		case 1:
+		{
+			r10 = *(uintptr_t*)(globals::base + 0x7821223);              //mov r10, [0x0000000004CA918F]
+			rdx ^= r11;             //xor rdx, r11
+			rax = 0x56F3C62967B05B8A;               //mov rax, 0x56F3C62967B05B8A
+			rcx = 0;                //and rcx, 0xFFFFFFFFC0000000
+			rdx ^= rax;             //xor rdx, rax
+			rcx = _rotl64(rcx, 0x10);               //rol rcx, 0x10
+			rcx ^= r10;             //xor rcx, r10
+			rcx = _byteswap_uint64(rcx);            //bswap rcx
+			rdx *= *(uintptr_t*)(rcx + 0x9);              //imul rdx, [rcx+0x09]
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0xB;            //shr rax, 0x0B
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x16;           //shr rax, 0x16
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x2C;           //shr rax, 0x2C
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x26;           //shr rax, 0x26
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x7;            //shr rax, 0x07
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0xE;            //shr rax, 0x0E
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x1C;           //shr rax, 0x1C
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x38;           //shr rax, 0x38
+			rdx ^= rax;             //xor rdx, rax
+			rax = 0xA7692940131CCC49;               //mov rax, 0xA7692940131CCC49
+			rdx *= rax;             //imul rdx, rax
+			rax = 0xB698B1C9E93059C1;               //mov rax, 0xB698B1C9E93059C1
+			rdx *= rax;             //imul rdx, rax
+			return rdx;
+		}
+		case 2:
+		{
+			r10 = *(uintptr_t*)(globals::base + 0x7821223);              //mov r10, [0x0000000004CA8BD6]
+			rax = r11;              //mov rax, r11
+			rax = globals::base;           //sub rax, [rsp+0x78] -- didn't find trace -> use base
+			rax -= 0x2C38EA16;              //sub rax, 0x2C38EA16
+			rdx ^= rax;             //xor rdx, rax
+			rax = 0xB4B93D59D2681089;               //mov rax, 0xB4B93D59D2681089
+			rdx *= rax;             //imul rdx, rax
+			rdx += r11;             //add rdx, r11
+			rax = globals::base;           //lea rax, [0xFFFFFFFFFD48777D]
+			rdx ^= rax;             //xor rdx, rax
+			rax = globals::base;           //lea rax, [0xFFFFFFFFFD487955]
+			rdx += rax;             //add rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x1C;           //shr rax, 0x1C
+			rdx ^= rax;             //xor rdx, rax
+			rcx = 0;                //and rcx, 0xFFFFFFFFC0000000
+			rax = rdx;              //mov rax, rdx
+			rcx = _rotl64(rcx, 0x10);               //rol rcx, 0x10
+			rax >>= 0x38;           //shr rax, 0x38
+			rcx ^= r10;             //xor rcx, r10
+			rdx ^= rax;             //xor rdx, rax
+			rax = 0x1CE3CAA84AA7682A;               //mov rax, 0x1CE3CAA84AA7682A
+			rcx = _byteswap_uint64(rcx);            //bswap rcx
+			rdx *= *(uintptr_t*)(rcx + 0x9);              //imul rdx, [rcx+0x09]
+			rdx -= rax;             //sub rdx, rax
+			return rdx;
+		}
+		case 3:
+		{
+			r10 = *(uintptr_t*)(globals::base + 0x7821223);              //mov r10, [0x0000000004CA86D6]
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x27;           //shr rax, 0x27
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0xB;            //shr rax, 0x0B
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x16;           //shr rax, 0x16
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x2C;           //shr rax, 0x2C
+			rdx ^= rax;             //xor rdx, rax
+			rcx = 0;                //and rcx, 0xFFFFFFFFC0000000
+			rcx = _rotl64(rcx, 0x10);               //rol rcx, 0x10
+			rax = 0x131F56B1238D73B5;               //mov rax, 0x131F56B1238D73B5
+			rdx *= rax;             //imul rdx, rax
+			rcx ^= r10;             //xor rcx, r10
+			rax = 0x1035435E575B6C59;               //mov rax, 0x1035435E575B6C59
+			rdx -= rax;             //sub rdx, rax
+			rcx = _byteswap_uint64(rcx);            //bswap rcx
+			rdx *= *(uintptr_t*)(rcx + 0x9);              //imul rdx, [rcx+0x09]
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x22;           //shr rax, 0x22
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x12;           //shr rax, 0x12
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x24;           //shr rax, 0x24
+			rdx ^= rax;             //xor rdx, rax
+			return rdx;
+		}
+		case 4:
+		{
+			//failed to translate: pop rdx
+			r10 = *(uintptr_t*)(globals::base + 0x7821223);              //mov r10, [0x0000000004CA822D]
+			rax = 0;                //and rax, 0xFFFFFFFFC0000000
+			rax = _rotl64(rax, 0x10);               //rol rax, 0x10
+			rax ^= r10;             //xor rax, r10
+			rax = _byteswap_uint64(rax);            //bswap rax
+			rdx *= *(uintptr_t*)(rax + 0x9);              //imul rdx, [rax+0x09]
+			rax = 0x4122953E9B59DAE5;               //mov rax, 0x4122953E9B59DAE5
+			rdx += rax;             //add rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x11;           //shr rax, 0x11
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x22;           //shr rax, 0x22
+			rdx ^= rax;             //xor rdx, rax
+			rax = globals::base;           //lea rax, [0xFFFFFFFFFD486DF4]
+			rdx -= rax;             //sub rdx, rax
+			rdx ^= r11;             //xor rdx, r11
+			rax = r11;              //mov rax, r11
+			rax = globals::base;           //sub rax, [rsp+0x78] -- didn't find trace -> use base
+			rax -= 0x58348A4C;              //sub rax, 0x58348A4C
+			rdx ^= rax;             //xor rdx, rax
+			rax = 0x2D70BFA88C1DE299;               //mov rax, 0x2D70BFA88C1DE299
+			rdx *= rax;             //imul rdx, rax
+			return rdx;
+		}
+		case 5:
+		{
+			r12 = globals::base + 0x6716;          //lea r12, [0xFFFFFFFFFD48D23F]
+			r10 = *(uintptr_t*)(globals::base + 0x7821223);              //mov r10, [0x0000000004CA7CF6]
+			rdx ^= r11;             //xor rdx, r11
+			rax = 0x37669064BDFE9EA;                //mov rax, 0x37669064BDFE9EA
+			rdx += rax;             //add rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x8;            //shr rax, 0x08
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x10;           //shr rax, 0x10
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x20;           //shr rax, 0x20
+			rdx ^= rax;             //xor rdx, rax
+			rdx += r11;             //add rdx, r11
+			uintptr_t RSP_0x48;
+			RSP_0x48 = globals::base + 0x21D5F0D4;                 //lea rax, [0x000000001F1E5C1B] : RSP+0x48
+			rdx += RSP_0x48;                //add rdx, [rsp+0x48]
+			rax = 0;                //and rax, 0xFFFFFFFFC0000000
+			rax = _rotl64(rax, 0x10);               //rol rax, 0x10
+			rax ^= r10;             //xor rax, r10
+			rax = _byteswap_uint64(rax);            //bswap rax
+			rdx *= *(uintptr_t*)(rax + 0x9);              //imul rdx, [rax+0x09]
+			rax = 0x8C4AA275AFE07453;               //mov rax, 0x8C4AA275AFE07453
+			rdx *= rax;             //imul rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0xF;            //shr rax, 0x0F
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x1E;           //shr rax, 0x1E
+			rdx ^= rax;             //xor rdx, rax
+			rcx = rdx;              //mov rcx, rdx
+			rcx >>= 0x3C;           //shr rcx, 0x3C
+			rdx ^= rcx;             //xor rdx, rcx
+			rax = r11;              //mov rax, r11
+			rax ^= r12;             //xor rax, r12
+			rdx -= rax;             //sub rdx, rax
+			return rdx;
+		}
+		case 6:
+		{
+			//failed to translate: pop rdx
+			r10 = *(uintptr_t*)(globals::base + 0x7821223);              //mov r10, [0x0000000004CA788E]
+			r15 = globals::base + 0x3FF1F77A;              //lea r15, [0x000000003D3A5DD2]
+			rcx = r11;              //mov rcx, r11
+			rcx = ~rcx;             //not rcx
+			rax = r15;              //mov rax, r15
+			rax = ~rax;             //not rax
+			rdx += rax;             //add rdx, rax
+			rdx += rcx;             //add rdx, rcx
+			rax = 0;                //and rax, 0xFFFFFFFFC0000000
+			rax = _rotl64(rax, 0x10);               //rol rax, 0x10
+			rax ^= r10;             //xor rax, r10
+			rax = _byteswap_uint64(rax);            //bswap rax
+			rdx *= *(uintptr_t*)(rax + 0x9);              //imul rdx, [rax+0x09]
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x6;            //shr rax, 0x06
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0xC;            //shr rax, 0x0C
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rcx = r11;              //mov rcx, r11
+			rax >>= 0x18;           //shr rax, 0x18
+			rdx ^= rax;             //xor rdx, rax
+			rax = globals::base;           //lea rax, [0xFFFFFFFFFD4862B7]
+			rcx -= rax;             //sub rcx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x30;           //shr rax, 0x30
+			rcx -= 0x14449F64;              //sub rcx, 0x14449F64
+			rcx ^= rax;             //xor rcx, rax
+			rdx ^= rcx;             //xor rdx, rcx
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x8;            //shr rax, 0x08
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x10;           //shr rax, 0x10
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x20;           //shr rax, 0x20
+			rdx ^= rax;             //xor rdx, rax
+			rax = 0x1BC2C247FD97588F;               //mov rax, 0x1BC2C247FD97588F
+			rdx ^= rax;             //xor rdx, rax
+			rax = 0xE2D3224BC82DCA86;               //mov rax, 0xE2D3224BC82DCA86
+			rdx ^= rax;             //xor rdx, rax
+			rax = 0x952977A961DEF5B5;               //mov rax, 0x952977A961DEF5B5
+			rdx *= rax;             //imul rdx, rax
+			return rdx;
+		}
+		case 7:
+		{
+			r12 = globals::base + 0x6DA1;          //lea r12, [0xFFFFFFFFFD48CED2]
+			r9 = *(uintptr_t*)(globals::base + 0x7821223);               //mov r9, [0x0000000004CA72DA]
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0xC;            //shr rax, 0x0C
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x18;           //shr rax, 0x18
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x30;           //shr rax, 0x30
+			rdx ^= rax;             //xor rdx, rax
+			rax = globals::base;           //lea rax, [0xFFFFFFFFFD485F4A]
+			rdx += rax;             //add rdx, rax
+			rdx ^= r11;             //xor rdx, r11
+			rdx ^= r12;             //xor rdx, r12
+			rax = 0;                //and rax, 0xFFFFFFFFC0000000
+			rax = _rotl64(rax, 0x10);               //rol rax, 0x10
+			rax ^= r9;              //xor rax, r9
+			rax = _byteswap_uint64(rax);            //bswap rax
+			rax = *(uintptr_t*)(rax + 0x9);               //mov rax, [rax+0x09]
+			uintptr_t RSP_0x28;
+			RSP_0x28 = 0x11156F7E6912ED7D;          //mov rax, 0x11156F7E6912ED7D : RSP+0x28
+			rax *= RSP_0x28;                //imul rax, [rsp+0x28]
+			rdx *= rax;             //imul rdx, rax
+			rax = 0x8442A66056336123;               //mov rax, 0x8442A66056336123
+			rdx ^= rax;             //xor rdx, rax
+			rax = r11;              //mov rax, r11
+			rax = globals::base;           //sub rax, [rsp+0x78] -- didn't find trace -> use base
+			rax += 0xFFFFFFFFFFFF59E1;              //add rax, 0xFFFFFFFFFFFF59E1
+			rdx += rax;             //add rdx, rax
+			rax = globals::base + 0x3B3BDD34;              //lea rax, [0x0000000038843A3F]
+			rax -= r11;             //sub rax, r11
+			rdx += rax;             //add rdx, rax
+			return rdx;
+		}
+		case 8:
+		{
+			r9 = *(uintptr_t*)(globals::base + 0x7821223);               //mov r9, [0x0000000004CA6D14]
+			rax = globals::base;           //lea rax, [0xFFFFFFFFFD4859C3]
+			rdx += rax;             //add rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x7;            //shr rax, 0x07
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0xE;            //shr rax, 0x0E
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x1C;           //shr rax, 0x1C
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x38;           //shr rax, 0x38
+			rdx ^= rax;             //xor rdx, rax
+			rax = 0xFE54433AB99670D9;               //mov rax, 0xFE54433AB99670D9
+			rdx *= rax;             //imul rdx, rax
+			rax = 0;                //and rax, 0xFFFFFFFFC0000000
+			rax = _rotl64(rax, 0x10);               //rol rax, 0x10
+			rax ^= r9;              //xor rax, r9
+			rax = _byteswap_uint64(rax);            //bswap rax
+			rax = *(uintptr_t*)(rax + 0x9);               //mov rax, [rax+0x09]
+			uintptr_t RSP_0x28;
+			RSP_0x28 = 0x707C989E1DF75A21;          //mov rax, 0x707C989E1DF75A21 : RSP+0x28
+			rax *= RSP_0x28;                //imul rax, [rsp+0x28]
+			rdx *= rax;             //imul rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x12;           //shr rax, 0x12
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x24;           //shr rax, 0x24
+			rdx ^= rax;             //xor rdx, rax
+			rax = globals::base;           //lea rax, [0xFFFFFFFFFD4859D2]
+			rdx ^= rax;             //xor rdx, rax
+			rax = 0x3E789F5419565466;               //mov rax, 0x3E789F5419565466
+			rdx ^= rax;             //xor rdx, rax
+			return rdx;
+		}
+		case 9:
+		{
+			r12 = globals::base + 0x5F624819;              //lea r12, [0x000000005CAA9E26]
+			r9 = *(uintptr_t*)(globals::base + 0x7821223);               //mov r9, [0x0000000004CA67DB]
+			rax = r12;              //mov rax, r12
+			rax = ~rax;             //not rax
+			rax *= r11;             //imul rax, r11
+			rax ^= r11;             //xor rax, r11
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x10;           //shr rax, 0x10
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x20;           //shr rax, 0x20
+			rdx ^= rax;             //xor rdx, rax
+			rax = 0x2D56E8150613B67A;               //mov rax, 0x2D56E8150613B67A
+			rdx -= rax;             //sub rdx, rax
+			rax = 0;                //and rax, 0xFFFFFFFFC0000000
+			rax = _rotl64(rax, 0x10);               //rol rax, 0x10
+			rax ^= r9;              //xor rax, r9
+			rax = _byteswap_uint64(rax);            //bswap rax
+			rdx *= *(uintptr_t*)(rax + 0x9);              //imul rdx, [rax+0x09]
+			rax = globals::base;           //lea rax, [0xFFFFFFFFFD485523]
+			rdx ^= rax;             //xor rdx, rax
+			rax = 0xCB760501238D6C11;               //mov rax, 0xCB760501238D6C11
+			rdx *= rax;             //imul rdx, rax
+			rax = 0x4FBDE321E4E187DD;               //mov rax, 0x4FBDE321E4E187DD
+			rdx *= rax;             //imul rdx, rax
+			return rdx;
+		}
+		case 10:
+		{
+			r10 = *(uintptr_t*)(globals::base + 0x7821223);              //mov r10, [0x0000000004CA62CD]
+			r12 = globals::base + 0x50F0C2A6;              //lea r12, [0x000000004E39133D]
+			rax = r11;              //mov rax, r11
+			rax = ~rax;             //not rax
+			rax *= r12;             //imul rax, r12
+			rdx += rax;             //add rdx, rax
+			rax = 0x5D20D5819D812B0E;               //mov rax, 0x5D20D5819D812B0E
+			rdx ^= rax;             //xor rdx, rax
+			rax = 0xB0C6DE8FE5EC7286;               //mov rax, 0xB0C6DE8FE5EC7286
+			rdx ^= rax;             //xor rdx, rax
+			rdx -= r11;             //sub rdx, r11
+			rax = 0x8F3C63ED5E5ACF53;               //mov rax, 0x8F3C63ED5E5ACF53
+			rdx *= rax;             //imul rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x26;           //shr rax, 0x26
+			rdx ^= rax;             //xor rdx, rax
+			rax = globals::base + 0x628C;          //lea rax, [0xFFFFFFFFFD48B19B]
+			rax -= r11;             //sub rax, r11
+			rcx = 0;                //and rcx, 0xFFFFFFFFC0000000
+			rdx += rax;             //add rdx, rax
+			rcx = _rotl64(rcx, 0x10);               //rol rcx, 0x10
+			rcx ^= r10;             //xor rcx, r10
+			rcx = _byteswap_uint64(rcx);            //bswap rcx
+			rdx *= *(uintptr_t*)(rcx + 0x9);              //imul rdx, [rcx+0x09]
+			return rdx;
+		}
+		case 11:
+		{
+			r10 = *(uintptr_t*)(globals::base + 0x7821223);              //mov r10, [0x0000000004CA5E26]
+			r15 = globals::base + 0x620DA68E;              //lea r15, [0x000000005F55F27E]
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x17;           //shr rax, 0x17
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x2E;           //shr rax, 0x2E
+			rdx ^= rax;             //xor rdx, rax
+			rax = r15;              //mov rax, r15
+			rax ^= r11;             //xor rax, r11
+			rdx += rax;             //add rdx, rax
+			rax = 0xAE5536B2D6AC7D85;               //mov rax, 0xAE5536B2D6AC7D85
+			rdx *= rax;             //imul rdx, rax
+			rax = globals::base;           //lea rax, [0xFFFFFFFFFD4849A2]
+			rdx += rax;             //add rdx, rax
+			rax = r11;              //mov rax, r11
+			rax = ~rax;             //not rax
+			uintptr_t RSP_0x48;
+			RSP_0x48 = globals::base + 0xA254;             //lea rax, [0xFFFFFFFFFD48EE12] : RSP+0x48
+			rax *= RSP_0x48;                //imul rax, [rsp+0x48]
+			rdx += rax;             //add rdx, rax
+			rax = 0x70A5567341388F09;               //mov rax, 0x70A5567341388F09
+			rdx ^= rax;             //xor rdx, rax
+			rax = 0;                //and rax, 0xFFFFFFFFC0000000
+			rax = _rotl64(rax, 0x10);               //rol rax, 0x10
+			rax ^= r10;             //xor rax, r10
+			rax = _byteswap_uint64(rax);            //bswap rax
+			rdx *= *(uintptr_t*)(rax + 0x9);              //imul rdx, [rax+0x09]
+			rax = globals::base;           //lea rax, [0xFFFFFFFFFD484A15]
+			rdx += rax;             //add rdx, rax
+			return rdx;
+		}
+		case 12:
+		{
+			r12 = globals::base + 0x2F3844CA;              //lea r12, [0x000000002C808BB5]
+			r9 = *(uintptr_t*)(globals::base + 0x7821223);               //mov r9, [0x0000000004CA58C3]
+			rax = globals::base + 0xB4F0;          //lea rax, [0xFFFFFFFFFD48FA7C]
+			rax = ~rax;             //not rax
+			rax *= r11;             //imul rax, r11
+			rdx += rax;             //add rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0xC;            //shr rax, 0x0C
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x18;           //shr rax, 0x18
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x30;           //shr rax, 0x30
+			rdx ^= rax;             //xor rdx, rax
+			rax = r12;              //mov rax, r12
+			rax = ~rax;             //not rax
+			rax -= r11;             //sub rax, r11
+			rdx += rax;             //add rdx, rax
+			rax = 0xEC9CBB3752ACA0AD;               //mov rax, 0xEC9CBB3752ACA0AD
+			rdx *= rax;             //imul rdx, rax
+			rdx += r11;             //add rdx, r11
+			rax = 0x444363F4A500959E;               //mov rax, 0x444363F4A500959E
+			rdx += rax;             //add rdx, rax
+			rax = 0;                //and rax, 0xFFFFFFFFC0000000
+			rax = _rotl64(rax, 0x10);               //rol rax, 0x10
+			rax ^= r9;              //xor rax, r9
+			rax = _byteswap_uint64(rax);            //bswap rax
+			rdx *= *(uintptr_t*)(rax + 0x9);              //imul rdx, [rax+0x09]
+			rax = 0xA0C47D17C58A0559;               //mov rax, 0xA0C47D17C58A0559
+			rdx ^= rax;             //xor rdx, rax
+			return rdx;
+		}
+		case 13:
+		{
+			//failed to translate: pop rdx
+			r10 = *(uintptr_t*)(globals::base + 0x7821223);              //mov r10, [0x0000000004CA5440]
+			r13 = globals::base + 0x25C2E896;              //lea r13, [0x00000000230B2AA0]
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x19;           //shr rax, 0x19
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x32;           //shr rax, 0x32
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x27;           //shr rax, 0x27
+			rdx ^= rax;             //xor rdx, rax
+			rax = globals::base + 0x62966F05;              //lea rax, [0x000000005FDEAE12]
+			rax += r11;             //add rax, r11
+			rdx ^= rax;             //xor rdx, rax
+			rax = 0xFF099BB3AB88BA97;               //mov rax, 0xFF099BB3AB88BA97
+			rdx *= rax;             //imul rdx, rax
+			rdx -= r11;             //sub rdx, r11
+			rcx = 0;                //and rcx, 0xFFFFFFFFC0000000
+			rcx = _rotl64(rcx, 0x10);               //rol rcx, 0x10
+			rax = rdx;              //mov rax, rdx
+			rcx ^= r10;             //xor rcx, r10
+			rcx = _byteswap_uint64(rcx);            //bswap rcx
+			rdx = r13;              //mov rdx, r13
+			rdx = ~rdx;             //not rdx
+			rax *= *(uintptr_t*)(rcx + 0x9);              //imul rax, [rcx+0x09]
+			rax += r11;             //add rax, r11
+			rdx += rax;             //add rdx, rax
+			return rdx;
+		}
+		case 14:
+		{
+			r10 = *(uintptr_t*)(globals::base + 0x7821223);              //mov r10, [0x0000000004CA4F4B]
+			rax = 0;                //and rax, 0xFFFFFFFFC0000000
+			rax = _rotl64(rax, 0x10);               //rol rax, 0x10
+			rax ^= r10;             //xor rax, r10
+			rax = _byteswap_uint64(rax);            //bswap rax
+			rdx *= *(uintptr_t*)(rax + 0x9);              //imul rdx, [rax+0x09]
+			rax = 0x8E93F56EEFBABF67;               //mov rax, 0x8E93F56EEFBABF67
+			rdx *= rax;             //imul rdx, rax
+			rax = 0x531487C50C675851;               //mov rax, 0x531487C50C675851
+			rdx *= rax;             //imul rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x19;           //shr rax, 0x19
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x32;           //shr rax, 0x32
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0xE;            //shr rax, 0x0E
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x1C;           //shr rax, 0x1C
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x38;           //shr rax, 0x38
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x19;           //shr rax, 0x19
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x32;           //shr rax, 0x32
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rcx = globals::base + 0x61F1;          //lea rcx, [0xFFFFFFFFFD489C35]
+			rax >>= 0x13;           //shr rax, 0x13
+			rcx = ~rcx;             //not rcx
+			rdx ^= rax;             //xor rdx, rax
+			rax = r11;              //mov rax, r11
+			rax = ~rax;             //not rax
+			rcx *= rax;             //imul rcx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x26;           //shr rax, 0x26
+			rdx ^= rax;             //xor rdx, rax
+			rdx += rcx;             //add rdx, rcx
+			return rdx;
+		}
+		case 15:
+		{
+			//failed to translate: pop rdx
+			r10 = *(uintptr_t*)(globals::base + 0x7821223);              //mov r10, [0x0000000004CA4AB6]
+			r12 = globals::base + 0x7B4A67C4;              //lea r12, [0x000000007892A044]
+			rax = 0x2193B3A646C10871;               //mov rax, 0x2193B3A646C10871
+			rdx *= rax;             //imul rdx, rax
+			rdx ^= r11;             //xor rdx, r11
+			rax = 0x569717F7DAB262A0;               //mov rax, 0x569717F7DAB262A0
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0xE;            //shr rax, 0x0E
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x1C;           //shr rax, 0x1C
+			rdx ^= rax;             //xor rdx, rax
+			rax = rdx;              //mov rax, rdx
+			rax >>= 0x38;           //shr rax, 0x38
+			rax ^= rdx;             //xor rax, rdx
+			rdx = globals::base + 0x9AC5;          //lea rdx, [0xFFFFFFFFFD48D02C]
+			rax += r11;             //add rax, r11
+			rdx += rax;             //add rdx, rax
+			rcx = 0;                //and rcx, 0xFFFFFFFFC0000000
+			rcx = _rotl64(rcx, 0x10);               //rol rcx, 0x10
+			rcx ^= r10;             //xor rcx, r10
+			rax = r12;              //mov rax, r12
+			rax ^= r11;             //xor rax, r11
+			rax -= r11;             //sub rax, r11
+			rcx = _byteswap_uint64(rcx);            //bswap rcx
+			rdx += rax;             //add rdx, rax
+			rdx *= *(uintptr_t*)(rcx + 0x9);              //imul rdx, [rcx+0x09]
+			return rdx;
+		}
+		}
+	}
+
+	uintptr_t get_bone_index(uint32_t bone_index) {
+		uint64_t rax = globals::base, rbx = globals::base, rcx = globals::base, rdx = globals::base, rdi = globals::base, rsi = globals::base, r8 = globals::base, r9 = globals::base, r10 = globals::base, r11 = globals::base, r12 = globals::base, r13 = globals::base, r14 = globals::base, r15 = globals::base;
+		rbx = bone_index;
+		rcx = rbx * 0x13C8;
+		rax = 0x4AD2CE6C11F9A497;               //mov rax, 0x4AD2CE6C11F9A497
+		r11 = globals::base;           //lea r11, [0xFFFFFFFFFD8377D3]
+		rax = _umul128(rax, rcx, (uintptr_t*)&rdx);             //mul rcx
+		r10 = 0xF9DE825D26E3B99B;               //mov r10, 0xF9DE825D26E3B99B
+		rdx >>= 0xB;            //shr rdx, 0x0B
+		rax = rdx * 0x1B5F;             //imul rax, rdx, 0x1B5F
+		rcx -= rax;             //sub rcx, rax
+		rax = 0x3B0E039359376BE7;               //mov rax, 0x3B0E039359376BE7
+		r8 = rcx * 0x1B5F;              //imul r8, rcx, 0x1B5F
+		rax = _umul128(rax, r8, (uintptr_t*)&rdx);              //mul r8
+		rdx >>= 0xB;            //shr rdx, 0x0B
+		rax = rdx * 0x22AE;             //imul rax, rdx, 0x22AE
+		r8 -= rax;              //sub r8, rax
+		rax = 0x97B425ED097B425F;               //mov rax, 0x97B425ED097B425F
+		rax = _umul128(rax, r8, (uintptr_t*)&rdx);              //mul r8
+		rax = 0x8F1779D9FDC3A219;               //mov rax, 0x8F1779D9FDC3A219
+		rdx >>= 0x5;            //shr rdx, 0x05
+		rcx = rdx * 0x36;               //imul rcx, rdx, 0x36
+		rax = _umul128(rax, r8, (uintptr_t*)&rdx);              //mul r8
+		rdx >>= 0x7;            //shr rdx, 0x07
+		rcx += rdx;             //add rcx, rdx
+		rax = rcx * 0x1CA;              //imul rax, rcx, 0x1CA
+		rcx = r8 * 0x1CC;               //imul rcx, r8, 0x1CC
+		rcx -= rax;             //sub rcx, rax
+		rax = *(uint16_t*)(rcx + r11 * 1 + 0x7834840);                //movzx eax, word ptr [rcx+r11*1+0x7834840]
+		r8 = rax * 0x13C8;              //imul r8, rax, 0x13C8
+		rax = r10;              //mov rax, r10
+		rax = _umul128(rax, r8, (uintptr_t*)&rdx);              //mul r8
+		rax = r10;              //mov rax, r10
+		rdx >>= 0xD;            //shr rdx, 0x0D
+		rcx = rdx * 0x20C9;             //imul rcx, rdx, 0x20C9
+		r8 -= rcx;              //sub r8, rcx
+		r9 = r8 * 0x3ED7;               //imul r9, r8, 0x3ED7
+		rax = _umul128(rax, r9, (uintptr_t*)&rdx);              //mul r9
+		rdx >>= 0xD;            //shr rdx, 0x0D
+		rax = rdx * 0x20C9;             //imul rax, rdx, 0x20C9
+		r9 -= rax;              //sub r9, rax
+		rax = 0x3521CFB2B78C1353;               //mov rax, 0x3521CFB2B78C1353
+		rax = _umul128(rax, r9, (uintptr_t*)&rdx);              //mul r9
+		rax = r9;               //mov rax, r9
+		rax -= rdx;             //sub rax, rdx
+		rax >>= 0x1;            //shr rax, 0x01
+		rax += rdx;             //add rax, rdx
+		rax >>= 0x7;            //shr rax, 0x07
+		rcx = rax * 0xD4;               //imul rcx, rax, 0xD4
+		rax = 0x5C9882B931057263;               //mov rax, 0x5C9882B931057263
+		rax = _umul128(rax, r9, (uintptr_t*)&rdx);              //mul r9
+		rax = r9;               //mov rax, r9
+		rax -= rdx;             //sub rax, rdx
+		rax >>= 0x1;            //shr rax, 0x01
+		rax += rdx;             //add rax, rdx
+		rax >>= 0x5;            //shr rax, 0x05
+		rcx += rax;             //add rcx, rax
+		rax = rcx * 0x5E;               //imul rax, rcx, 0x5E
+		rcx = r9 + r9 * 2;              //lea rcx, [r9+r9*2]
+		rcx <<= 0x5;            //shl rcx, 0x05
+		rcx -= rax;             //sub rcx, rax
+		rsi = *(uint16_t*)(rcx + r11 * 1 + 0x783A8E0);                //movsx esi, word ptr [rcx+r11*1+0x783A8E0]
+		return rsi;
+	}
 
     struct ref_def_key {
         int ref0;

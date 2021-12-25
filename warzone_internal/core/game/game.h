@@ -61,7 +61,13 @@ namespace game {
 		void get_box(vec2_t screen_origin, vec2_t screen_head, vec2_t& top_left, vec2_t& bottom_right);
 
 		int get_stance();
+
+		uintptr_t get_bone_ptr(uintptr_t bone_base, uint64_t bone_index);
+
+		vec3_t get_bone_position(uintptr_t bone_ptr, vec3_t& base_pos, int bone);
 	};
+
+	vec3_t get_bone_base_pos(uintptr_t client_info);
 
 	player_t get_local();
 
@@ -78,6 +84,10 @@ namespace decryption {
 	uintptr_t get_client_info(uintptr_t peb);
 
 	uintptr_t get_client_info_base(uintptr_t client_info, uintptr_t peb);
+
+	uintptr_t get_bone_base(uintptr_t peb);
+
+	uintptr_t get_bone_index(uint32_t bone_index);
 
 	uintptr_t get_ref_def();
 }
