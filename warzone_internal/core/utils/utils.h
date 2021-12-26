@@ -14,10 +14,6 @@ namespace utils {
 
 	void log_init(std::string file_path);
 
-	inline float radians_to_deg(float radians) {
-		return radians * (180.0 / M_PI);
-	}
-
 	inline std::string get_time() {
 		time_t now = time(0);
 		struct tm  tstruct;

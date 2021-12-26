@@ -6,9 +6,14 @@
 #include "../../renderer/renderer.h"
 
 vec2_t calc_relative_angles(vec3_t source, vec3_t dest, vec2_t angles) {
-	auto delta = dest - source;
-	vec2_t relative_angles{ utils::radians_to_deg(atan2(-delta.z, hypot(delta.x, delta.y))) - angles.x, 
-							utils::radians_to_deg(atan2(delta.y, delta.x)) - angles.y };
+	auto delta = source - dest;
+	vec2_t relative_angles{};
+	auto radians_to_degrees = [](float radians) { return radians * 180 / static_cast<float>(M_PI); };
+	relative_angles.x = radians_to_degrees(atanf(delta.z / hypotf(delta.x, delta.y))) - angles.x;
+	relative_angles.y = radians_to_degrees(atanf(delta.y / delta.x)) - angles.y;
+
+	if (delta.x >= 0.0)
+		angles.y += 180.0f;
 
 	relative_angles.normalize();
 	return relative_angles;
@@ -40,7 +45,7 @@ namespace features {
 			}
 		}
 
-		if (!best_player)
+		/*if (!best_player)
 			return;
 
 		vec2_t w2s{};
@@ -68,6 +73,6 @@ namespace features {
 		input.mi.dx = dx_f;
 		input.mi.dy = dy_f;
 		input.mi.dwFlags = MOUSEEVENTF_MOVE;
-		utils::send_input(input);
+		utils::send_input(input);*/
 	}
 }
