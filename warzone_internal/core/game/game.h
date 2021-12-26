@@ -1,6 +1,7 @@
 #pragma once
 #include <Windows.h>
 #include "../utils/vectors.h"
+#include <vector>
 
 struct ImVec4;
 
@@ -8,6 +9,8 @@ namespace game {
 	extern uintptr_t client_info;
 
 	extern uintptr_t client_info_base;
+
+	extern uintptr_t bone_base;
 
 	struct ref_def_view {
 		vec2_t tan_half_fov;
@@ -33,6 +36,8 @@ namespace game {
 
 	int local_index();
 
+	float get_fov();
+
 	enum stance {
 		standing = 0,
 		crouching = 1,
@@ -40,13 +45,47 @@ namespace game {
 		downed = 3,
 	};
 
+	enum bones {
+		bone_pos_helmet = 8,
+
+		bone_pos_head = 7,
+		bone_pos_neck = 6,
+		bone_pos_chest = 5,
+		bone_pos_mid = 4,
+		bone_pos_tummy = 3,
+		bone_pos_pelvis = 2,
+
+		bone_pos_right_foot_1 = 21,
+		bone_pos_right_foot_2 = 22,
+		bone_pos_right_foot_3 = 23,
+		bone_pos_right_foot_4 = 24,
+
+		bone_pos_left_foot_1 = 17,
+		bone_pos_left_foot_2 = 18,
+		bone_pos_left_foot_3 = 19,
+		bone_pos_left_foot_4 = 20,
+
+		bone_pos_left_hand_1 = 13,
+		bone_pos_left_hand_2 = 14,
+		bone_pos_left_hand_3 = 15,
+		bone_pos_left_hand_4 = 16,
+
+		bone_pos_right_hand_1 = 9,
+		bone_pos_right_hand_2 = 10,
+		bone_pos_right_hand_3 = 11,
+		bone_pos_right_hand_4 = 12
+	};
+
 	class player_t {
 	public:
-		player_t(uintptr_t address) {
+		player_t(uintptr_t address, int id) {
 			this->address = address;
+			this->id = id;
 		}
 
 		uintptr_t address{};
+
+		int id{};
 
 		bool is_valid();
 
@@ -62,12 +101,16 @@ namespace game {
 
 		int get_stance();
 
-		uintptr_t get_bone_ptr(uintptr_t bone_base, uint64_t bone_index);
-
-		vec3_t get_bone_position(uintptr_t bone_ptr, vec3_t& base_pos, int bone);
+		vec3_t get_bone(vec3_t bone_base_pos, int id);
 	};
 
+	extern std::vector<player_t> valid_players;
+
 	vec3_t get_bone_base_pos(uintptr_t client_info);
+
+	vec3_t get_camera_position();
+
+	vec2_t get_camera_angles();
 
 	player_t get_local();
 

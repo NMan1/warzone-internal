@@ -83,18 +83,40 @@ namespace utils {
 		static auto version = get_version();
 		int id = 4138;
 
-		if (version == "1507") { id = 4141; }
-		else if (version == "1511") { id = 4141; }
-		else if (version == "1607") { id = 4141; }
-		else if (version == "1703") { id = 4141; }
-		else if (version == "1709") { id = 4141; }
-		else if (version == "1803") { id = 4141; }
-		else if (version == "1809") { id = 4141; }
-		else if (version == "1903") { id = 4141; }
-		else if (version == "1909") { id = 4141; }
-		else if (version == "2004") { id = 4138; }
-		else if (version == "20H2") { id = 4138; }
-		else if (version == "21H2") { id = 5149; }
+		if (version == "1507") { 
+			id = 4141; 
+		}
+		else if (version == "1511") { 
+			id = 4141; 
+		}
+		else if (version == "1607") { 
+			id = 4141; 
+		}
+		else if (version == "1703") {
+			id = 4141; }
+		else if (version == "1709") { 
+			id = 4141;
+		}
+		else if (version == "1803") { 
+			id = 4141; 
+		}
+		else if (version == "1809") { 
+			id = 4141;
+		}
+		else if (version == "1903") { 
+			id = 4141; 
+		}
+		else if (version == "1909") { 
+			id = 4141; 
+		}
+		else if (version == "2004") {
+			id = 4138; 
+		}
+		else if (version == "20H2") { 
+			id = 4138; }
+		else if (version == "21H2") { 
+			id = 5149; 
+		}
 
 		return syscall<bool>(id, point, 1, 127);
 	}
@@ -103,19 +125,84 @@ namespace utils {
 		static auto version = get_version();
 		int id = 4122;
 
-		if (version == "1507") { id = 4125; }
-		else if (version == "1511") { id = 4125; }
-		else if (version == "1607") { id = 4125; }
-		else if (version == "1703") { id = 4125; }
-		else if (version == "1709") { id = 4125; }
-		else if (version == "1803") { id = 4125; }
-		else if (version == "1809") { id = 4125; }
-		else if (version == "1903") { id = 4125; }
-		else if (version == "1909") { id = 4125; }
-		else if (version == "2004") { id = 4122; }
-		else if (version == "20H2") { id = 4122; }
-		else if (version == "21H2") { id = 4120; }
+		if (version == "1507") {
+			id = 4125; 
+		}
+		else if (version == "1511") { 
+			id = 4125; 
+		}
+		else if (version == "1607") { 
+			id = 4125; 
+		}
+		else if (version == "1703") { 
+			id = 4125; 
+		}
+		else if (version == "1709") { 
+			id = 4125; 
+		}
+		else if (version == "1803") { 
+			id = 4125;
+		}
+		else if (version == "1809") { 
+			id = 4125; 
+		}
+		else if (version == "1903") {
+			id = 4125;
+		}
+		else if (version == "1909") { 
+			id = 4125; 
+		}
+		else if (version == "2004") {
+			id = 4122;
+		}
+		else if (version == "20H2") { 
+			id = 4122;
+		}
+		else if (version == "21H2") {
+			id = 4120;
+		}
 
 		return syscall<HCURSOR>(id, cursor);
+	}
+
+	ULONG send_input(INPUT input) {
+		static auto version = get_version();
+		int id = 4223;
+
+		if (version == "1507") {
+			id = 4228;
+		}
+		else if (version == "1511") {
+			id = 4228;
+		}
+		else if (version == "1607") {
+			id = 4228;
+		}
+		else if (version == "1703") {
+			id = 4226;
+		}
+		else if (version == "1709") {
+			id = 4226;
+		}
+		else if (version == "1803") {
+			id = 4226;
+		}
+		else if (version == "1809") {
+			id = 4226;
+		}
+		else if (version == "1903") {
+			id = 4226;
+		}
+		else if (version == "1909") {
+			id = 4226;
+		}
+		else if (version == "2004") {
+			id = 4223;
+		}
+		else if (version == "20H2") {
+			id = 4223;
+		}
+
+		return syscall<ULONG>(id, 1, &input, sizeof(INPUT));
 	}
 }

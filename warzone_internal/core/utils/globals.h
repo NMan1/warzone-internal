@@ -48,6 +48,12 @@ namespace globals {
 
 		extern clr snap_lines_clr;
 
+		extern bool aimbot;
+
+		extern bool aimbot_key_toggle;
+
+		extern int fov;
+
 		extern bool no_recoil;
 		
 		extern bool no_recoil_key_toggle;

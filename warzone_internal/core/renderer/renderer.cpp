@@ -217,39 +217,30 @@ namespace renderer {
 	LRESULT wndproc(HWND hwnd, UINT msg, WPARAM param, LPARAM lparam) {
 		ImGuiIO& io = ImGui::GetIO();
 		switch (msg) {
-		/*case WM_SETCURSOR: {
-			if (io.WantCaptureMouse) {
-				return ImGui_ImplWin32_WndProcHandler(hwnd, msg, param, lparam);
-			}
-			else {
-				return CallWindowProc(renderer::original_wndproc, hwnd, msg, param, lparam);
-			}
-		}*/
 		case WM_KEYDOWN: {
 			if (param == VK_END)
 				globals::settings::end_cheat = true;
 			else if (param == VK_INSERT || param == VK_F5) // 0x4E = M
 				menu::open = !menu::open;
 			else if (param == VK_LBUTTON)
-				globals::settings::no_recoil_key_toggle = true;
+				globals::settings::no_recoil_key_toggle = true;			
+			else if (param == VK_SHIFT)
+				globals::settings::aimbot_key_toggle = true;
+			break;
+		case WM_KEYUP:
+			if (param == VK_SHIFT)
+				globals::settings::aimbot_key_toggle = false;
+			break;
+		case WM_LBUTTONDOWN:
+			globals::settings::no_recoil_key_toggle = true;
+			//globals::settings::aimbot_key_toggle = true;
+			break;
+		case WM_LBUTTONUP:
+			globals::settings::no_recoil_key_toggle = false;
+			//globals::settings::aimbot_key_toggle = false;
 			break;
 		}
 		};
-
-		/*ImGui_ImplWin32_WndProcHandler(hwnd, msg, param, lparam);
-		if (io.WantCaptureMouse &&
-			(msg == WM_LBUTTONDOWN || msg == WM_LBUTTONUP || msg == WM_RBUTTONDOWN || msg == WM_RBUTTONUP ||
-				msg == WM_MBUTTONDOWN || msg == WM_MBUTTONUP || msg == WM_MOUSEWHEEL || msg == WM_MOUSEMOVE ||
-				msg == WM_MOUSEHOVER || msg == WM_KEYDOWN || msg == WM_KEYUP)) {
-			return TRUE;
-		}
-		if (io.WantCaptureKeyboard && (
-			msg == WM_KEYDOWN || msg == WM_KEYUP
-			)) {
-			return TRUE;
-		}
-
-		return CallWindowProc(renderer::original_wndproc, hwnd, msg, param, lparam);*/
 
 		if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, param, lparam))
 			return true;

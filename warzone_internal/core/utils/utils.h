@@ -5,12 +5,18 @@
 #include <stdarg.h>
 #include <fstream>
 
+#define M_PI 3.14159265358979323846
+
 namespace utils {
 	extern std::ofstream* log_file;
 
 	extern std::string log_path;
 
 	void log_init(std::string file_path);
+
+	inline float radians_to_deg(float radians) {
+		return radians * (180.0 / M_PI);
+	}
 
 	inline std::string get_time() {
 		time_t now = time(0);
@@ -41,4 +47,6 @@ namespace utils {
 	bool get_cursor_pos(LPPOINT point);
 
 	HCURSOR set_cursor(HCURSOR cursor);
+
+	ULONG send_input(INPUT input);
 }

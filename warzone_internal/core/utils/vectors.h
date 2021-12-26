@@ -226,6 +226,22 @@ public:
 	inline float length() {
 		return sqrt((x * x) + (y * y));
 	}
+ 
+	inline void normalize() {
+		if (x > 180.0) {
+			x -= 360.0;
+		}
+		if (x < -180.0) {
+			x += 360.0;
+		}
+
+		if (y > 180.0) {
+			y -= 360.0;
+		}
+		if (y < -180.0) {
+			y += 360.0;
+		}
+	}
 
 	D2D1_RECT_F rect();
 };

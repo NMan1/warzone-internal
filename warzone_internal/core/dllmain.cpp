@@ -7,7 +7,7 @@
 #include "game/features/features.h"
 #include <dxgi1_4.h>
 
-#define VERSION "1.2"
+#define VERSION "1.3"
 
 extern "C" { unsigned int _fltused = 1; }
 
@@ -31,30 +31,9 @@ extern "C" long __declspec(dllexport) hook_main(IDXGISwapChain3* swapchain, UINT
         }
 
 		renderer::init();
-
 		renderer::original_wndproc = reinterpret_cast<WNDPROC>(SetWindowLongPtrW((HWND)globals::window, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(renderer::wndproc)));
-
 		globals::base = (uintptr_t)GetModuleHandleA(NULL);	
-
-		game::client_info = decryption::get_client_info(__readgsqword(0x60));
-		if (!game::client_info) {
-			utils::log("invalid client info");
-			exit(0);
-		}
-
-		game::client_info_base = decryption::get_client_info_base(game::client_info, __readgsqword(0x60));
-		if (!game::client_info_base) {
-			utils::log("invalid client info base");
-			exit(0);
-		}
-
-		auto ref_temp = decryption::get_ref_def();
-		if (!ref_temp) {
-			utils::log("invalid ref def ptr");
-			exit(0);
-		}
-
-		game::ref_def = *(game::ref_def_t*)ref_temp;
+		decryption::update();
 
 		utils::log("intialzied");
 		init = true;
@@ -63,21 +42,6 @@ extern "C" long __declspec(dllexport) hook_main(IDXGISwapChain3* swapchain, UINT
 	renderer::begin();
 	renderer::draw_text("overflow", { 15, 25 }, 18, { 255, 255, 255, 255 }); 
 	renderer::draw_text("    ver " + std::string(VERSION), {15, 42}, 15, { 255, 7, 58, 255});
-
-	const auto bone_base = decryption::get_bone_base(__readgsqword(0x60));
-	char buf[64];
-	sprintf(buf, "bone_base %p", bone_base);
-	renderer::draw_text(buf, { 15, 200 }, 16, { 255, 50, 50, 255 });
-
-	const auto bone_index = decryption::get_bone_index(7);
-	sprintf(buf, "bone_index %p", bone_index);
-	renderer::draw_text(buf, { 15, 215 }, 16, { 255, 50, 50, 255 });
-
-	if (game::client_info) {
-		const auto bone_base_pos = game::get_bone_base_pos(game::client_info);
-		sprintf(buf, "bone_base_pos %d, %d, %d", bone_base_pos.x, bone_base_pos.y, bone_base_pos.z);
-		renderer::draw_text(buf, { 15, 230 }, 16, { 255, 50, 50, 255 });
-	}
 
 	static bool new_game = true;
 	auto ref_def_ptr = decryption::get_ref_def();
@@ -89,11 +53,18 @@ extern "C" long __declspec(dllexport) hook_main(IDXGISwapChain3* swapchain, UINT
 
 		game::ref_def = *(game::ref_def_t*)ref_def_ptr;
 
-		features::esp();
+		if (globals::settings::esp) {
+			features::esp();
+		}
+
+		if (globals::settings::aimbot && globals::settings::aimbot_key_toggle) {
+			features::aimbot();
+		}
+
+		game::valid_players.clear();
 
 		if (globals::settings::no_recoil && globals::settings::no_recoil_key_toggle) {
 			features::no_recoil();
-			globals::settings::no_recoil_key_toggle = false;
 		}
 	}
 	else {

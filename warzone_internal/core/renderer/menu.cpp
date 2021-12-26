@@ -124,6 +124,11 @@ namespace menu {
 				ImGui::Checkbox("distance text", &globals::settings::distance_text);
 				ImGui::ColorPicker("distance text color", &globals::settings::distance_text_clr, ImGuiColorEditFlags_NoInputs);
 
+				ImGui::Checkbox("aimbot", &globals::settings::aimbot);
+
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 17);
+				ImGui::SliderInt22("fov", &globals::settings::fov, 1, 90);
+
 				ImGui::Checkbox("no recoil", &globals::settings::no_recoil);
 			}
 

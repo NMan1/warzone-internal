@@ -16,7 +16,7 @@ namespace globals {
 	int height = 0;
 
 	namespace settings {
-		bool end = false;
+		bool end_cheat = false;
 
 		bool esp = true;
 
@@ -37,6 +37,12 @@ namespace globals {
 		bool snap_lines = true;
 
 		clr snap_lines_clr = { 51, 51, 51, 225 };
+
+		bool aimbot = true;
+
+		bool aimbot_key_toggle = false;
+
+		int fov = 15;
 
 		bool no_recoil = true;
 
