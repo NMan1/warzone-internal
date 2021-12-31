@@ -127,6 +127,9 @@ namespace menu {
 				ImGui::Checkbox("aimbot", &globals::settings::aimbot);
 
 				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 17);
+				ImGui::SliderInt22("speed", &globals::settings::aimbot_speed, 1, 100);
+				
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 17);
 				ImGui::SliderInt22("fov", &globals::settings::fov, 1, 90);
 
 				ImGui::Checkbox("no recoil", &globals::settings::no_recoil);

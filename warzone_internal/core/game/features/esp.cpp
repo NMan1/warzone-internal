@@ -25,14 +25,13 @@ namespace features {
 			if (game::w2s(origin_pos, screen_origin)) {
 				auto dist = (int)game::units_to_m(local_pos.distance_to(origin_pos));
 				if (dist < globals::settings::max_render_distance) {
-					auto chest = player.get_bone(bone_base_pos, game::bone_pos_chest);
-					if (game::units_to_m(local_pos.distance_to(chest)) < 200) {
-						vec2_t screen_cheat{};
-						if (game::w2s(player.get_bone(bone_base_pos, game::bone_pos_chest), screen_cheat)) {
-							renderer::draw_circle(screen_cheat, 18, { 255, 7, 58, 255 }, 1, 32);
-						}
-						game::valid_players.push_back(player);
-					}
+					//auto chest = player.get_bone(bone_base_pos, game::bone_pos_neck);
+					//if (game::units_to_m(local_pos.distance_to(chest)) < 200) {
+					//	vec2_t screen_cheat{};
+					//	if (game::w2s(player.get_bone(bone_base_pos, game::bone_pos_chest), screen_cheat)) {
+					//		renderer::draw_circle(screen_cheat, 5, { 255, 7, 58, 255 }, 1, 32);
+					//	}
+					//}
 
 					auto head_pos = player.get_head_position(origin_pos);
 					head_pos += {0, 0, 10};

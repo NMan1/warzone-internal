@@ -38,9 +38,11 @@ namespace globals {
 
 		clr snap_lines_clr = { 51, 51, 51, 225 };
 
-		bool aimbot = true;
+		bool aimbot = false;
 
 		bool aimbot_key_toggle = false;
+
+		int aimbot_speed = 10;
 
 		int fov = 15;
 

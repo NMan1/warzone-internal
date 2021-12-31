@@ -14,8 +14,6 @@ namespace game {
 
 	HWND window_handle = 0;
 
-    std::vector<player_t> valid_players{};
-
     BOOL CALLBACK callback(HWND hwnd, LPARAM param) {
         DWORD pid;
         GetWindowThreadProcessId(hwnd, &pid);
@@ -52,7 +50,8 @@ namespace game {
 	}
 
     float get_fov() {
-        return utils::radians_to_deg(atan(game::ref_def.view.tan_half_fov.length()) * 2.0);
+        auto radians_to_degrees = [](float radians) { return radians * 180 / static_cast<float>(M_PI); };
+        return radians_to_degrees(atan(game::ref_def.view.tan_half_fov.length()) * 2.0);
     }
 
 	bool player_t::is_valid() {
@@ -162,7 +161,7 @@ namespace game {
         auto camera = *(uintptr_t*)(globals::base + offsets::camera_base);
         if (!camera)
             return {};
-        return *(vec2_t*)(camera + offsets::camera_pos + 0x12);
+        return *(vec2_t*)(camera + offsets::camera_pos + 0xC);
     }
 
 	bool world_to_screen(vec3_t world_location, vec2_t& out, vec3_t camera_pos, int screen_width, int screen_height, vec2_t fov, vec3_t matricies[3]) {

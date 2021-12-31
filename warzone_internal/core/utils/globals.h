@@ -52,6 +52,8 @@ namespace globals {
 
 		extern bool aimbot_key_toggle;
 
+		extern int aimbot_speed;
+
 		extern int fov;
 
 		extern bool no_recoil;

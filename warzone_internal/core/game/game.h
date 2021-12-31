@@ -104,8 +104,6 @@ namespace game {
 		vec3_t get_bone(vec3_t bone_base_pos, int id);
 	};
 
-	extern std::vector<player_t> valid_players;
-
 	vec3_t get_bone_base_pos(uintptr_t client_info);
 
 	vec3_t get_camera_position();

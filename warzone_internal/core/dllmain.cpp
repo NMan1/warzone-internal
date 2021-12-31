@@ -61,8 +61,6 @@ extern "C" long __declspec(dllexport) hook_main(IDXGISwapChain3* swapchain, UINT
 			features::aimbot();
 		}
 
-		game::valid_players.clear();
-
 		if (globals::settings::no_recoil && globals::settings::no_recoil_key_toggle) {
 			features::no_recoil();
 		}
