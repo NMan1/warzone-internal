@@ -74,7 +74,7 @@ namespace features {
 		auto tickrate_multiplier = 1.0;
 		auto speed_multiplier = globals::settings::aimbot_speed;
 		auto scale = 1.0 / 2.5;
-
+// credits mutavblew
 		auto multiplier = fov_multiplier * tickrate_multiplier * speed_multiplier;
 		auto scaled_delta = target_angles * (multiplier * scale);
 
