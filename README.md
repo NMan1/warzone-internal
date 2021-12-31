@@ -4,6 +4,7 @@
 
 - esp
 - aimbot
+- no recoil
 - imgui menu
 - injector not included
   - to inject u will either need to do one of 2 things:
