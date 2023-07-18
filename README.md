@@ -2,10 +2,10 @@
 
 ### Modern warefare / warzone cheat
 
-- esp
+- Damage 
 - aimbot
 - no recoil
-- imgui menu
+- bullet 
 - injector not included
   - to inject u will either need to do one of 2 things:
   - 1. create dll main which hooks present apon injection
